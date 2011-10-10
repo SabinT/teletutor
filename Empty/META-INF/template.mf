@@ -1,0 +1,7 @@
+Manifest-Version: 2.0
+Bundle-Name: BUNDLE_NAME_HERE
+Bundle-SymbolicName: teletutor.newbundle
+Bundle-Description: DESCRIPTION_HERE
+Bundle-Vendor: WHATCHA_NAME
+Bundle-Activator: teletutor.newbundle.Activator
+Bundle-Category: Teletutor
