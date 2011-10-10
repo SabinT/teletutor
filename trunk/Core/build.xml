@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<project name="Core" default="1. Jar Only" xmlns:bundlor="antlib:com.springsource.bundlor.ant">
+    <!--
+        jar:        generate jar file from compiled sources with an EMPTY manifest file
+        
+        manifest:   generate manifest file using BUNDLOR and save it to META-INF/MANIFEST.MF
+                    (This takes time, so call this only when the manifest template changes
+                    Otherwise call "1. Jar Only" if manifest is already up-to-date
+                            
+        update-manifest: update the manifest of the generated jar file dist/{project}.jar
+        
+        copy-bundle: copy the bundle to the plugins directory
+    -->
+    <target name="0. All" depends="init, compile, jar, manifest, update-manifest, copy-bundle" />
+    <target name="1. Jar Only" depends="init, compile, jar, update-manifest, copy-bundle" />
+    
+    <target name="init">
+        <mkdir dir="out" />
+        <copy todir="out/resources" overwrite="true">
+            <fileset dir="resources" />
+        </copy>
+        <copy todir="out">
+            <fileset dir="libraries"/>
+        </copy>
+    </target>
+    
+    <target name="compile">
+        <javac destdir="out" debug="on" srcdir="src">
+            <classpath>
+                <fileset dir="libraries" />
+                <pathelement location="../../framework.jar" />
+                <pathelement location="../../jars/com.springsource.org.apache.commons.io-1.4.0.jar" />
+            </classpath>
+        </javac>
+    </target>
+    
+    <target name="jar">
+        <jar basedir="out" jarfile="dist/${ant.project.name}.jar"
+            compress="true" includes="**/*" />
+    </target>
+    
+    <target name="update-manifest">
+        <jar destfile="dist/${ant.project.name}.jar" update="true"
+            manifest="META-INF/manifest.mf" />
+    </target>
+    
+    <target name="copy-bundle">
+        <copy file="dist/${ant.project.name}.jar" todir="../../plugins" overwrite="true"/>
+    </target>
+    
+    <target name="3. Clean">
+        <delete dir="out" />
+        <delete dir="dist" />
+        <delete file="../../plugins/${ant.project.name}.jar" />
+    </target>
+    
+    <!--    The Bundlor stuff now   -->
+    <property name="bundlor.home" location="D:\Java\Bundlor\bundlor-1.0.0.RELEASE" />
+    
+    <target name="manifest" depends="bundlor.init, bundlor.gen-manifest" />
+    <target name="bundle" depends="bundlor.init, bundlor.jar" />
+    
+    <target name="bundlor.init">
+        <taskdef resource="com/springsource/bundlor/ant/antlib.xml"
+            uri="antlib:com.springsource.bundlor.ant">
+            <classpath id="bundlor.classpath">
+                <fileset dir="${bundlor.home}/dist"/>
+                <fileset dir="${bundlor.home}/lib"/>
+            </classpath>
+        </taskdef>
+    </target>
+    
+    <target name="bundlor.jar">
+        <bundlor:bundlor
+            inputPath="${basedir}/dist/${ant.project.name}.jar"
+            outputPath="${basedir}/dist/${ant.project.name}.jar"
+            bundleVersion="1.0.0"
+            manifestTemplatePath="${basedir}/META-INF/template.mf"
+            >
+        </bundlor:bundlor>
+    </target>
+    
+    <target name="bundlor.gen-manifest">
+        <bundlor:bundlor
+            inputPath="${basedir}/dist/${ant.project.name}.jar"
+            outputPath="${basedir}"
+            bundleVersion="1.0.0"
+            manifestTemplatePath="${basedir}/META-INF/template.mf"
+            >
+        </bundlor:bundlor>
+    </target>
+</project>
