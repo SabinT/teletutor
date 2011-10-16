@@ -5,8 +5,11 @@
 package teletutor.core.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
+import org.jgroups.Address;
 import org.jgroups.ChannelClosedException;
 import org.jgroups.ChannelNotConnectedException;
 import org.jgroups.JChannel;
@@ -15,10 +18,11 @@ import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
+import teletutor.core.services.ViewObserver;
 
 /**
  *
- * @author Rae
+ * @author Sabin Timalsena
  */
 public class TeleChannelImpl implements TeleChannel {
     
@@ -27,11 +31,17 @@ public class TeleChannelImpl implements TeleChannel {
     
     private TeleChannel.Privilege privilege;
     
-    public TeleChannelImpl() {
-        
-    }
-    
-    public void createChannel(String configFile, String groupName, String channelName) 
+    /**
+     * Start the channel based on the protocol stack in the config file.
+     * @param configFile The .xml file with all the protocols
+     * @param groupName The name of the group to join or create
+     * @param channelName The name of this node/channel in the group; should be
+     *  same as the username of the member
+     * 
+     * Note that starting a new channel is a lengthy process, and may take some time
+     * @throws Exception 
+     */
+    public TeleChannelImpl (String configFile, String groupName, String channelName) 
     throws Exception
     {
         try {
@@ -66,7 +76,6 @@ public class TeleChannelImpl implements TeleChannel {
         
         channelMap.put(obj.getName(), obj);
         System.out.println("Object Registered, class: " + obj.getClass().getName());
-        if (obj instanceof TeleObject) System.out.println("Yes, instance of " + TeleObject.class.getName());
     }
 
     @Override
@@ -101,6 +110,41 @@ public class TeleChannelImpl implements TeleChannel {
         }
     }
 
+    /**
+     * Send a message on a specific subchannel (TeleObject) to a specific member
+     * of the group.
+     * @param member
+     * @param tObj The subchannel
+     * @param obj The message to be sent
+     * @throws Exception 
+     */
+    @Override
+    public void send(String memberStr, TeleObject tObj, Serializable obj) throws Exception {
+        // drop the message if desired subChannel does not exist
+        if (!channelMap.containsKey(tObj.getName())) return;
+        
+        // TODO take appropriate action based on the privilege.
+        
+        Address member = memberMap.get(memberStr);
+        if (member == null) {
+            System.out.println("Could not find the member to send message to " + memberStr);
+            return;
+        }
+        Message msg = new Message(member, null, obj);
+        
+        // include a header to identify the message subChannel
+        SubChannelHeader hdr = new SubChannelHeader(tObj.getName());
+        msg.putHeader((short)2000, hdr);
+        
+        try {
+            channel.send(msg);
+        } catch (ChannelNotConnectedException ex) {
+            throw new Exception(ex.getMessage());
+        } catch (ChannelClosedException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
+    
     @Override
     public void setPrivilege(Privilege prv) {
         privilege = prv;
@@ -109,6 +153,27 @@ public class TeleChannelImpl implements TeleChannel {
     @Override
     public Privilege getPrivilege() {
         return privilege;
+    }
+
+    // storage and notification mechanism for class members
+    private Map<String,Address> memberMap = new HashMap<String, Address>();
+    private ArrayList<ViewObserver> viewObservers = new ArrayList<ViewObserver>();
+    
+    @Override
+    public void addViewObserver(ViewObserver obs) {
+        viewObservers.add(obs);
+    }
+
+    @Override
+    public void removeViewObserver(ViewObserver obs) {
+        viewObservers.remove(obs);
+    }
+
+    @Override
+    public void notifyViewObservers() {
+        for (ViewObserver obs: viewObservers) {
+            obs.newViewArrived(memberMap.keySet());
+        }
     }
 
     class SimpleReceiver extends ReceiverAdapter {
@@ -129,9 +194,17 @@ public class TeleChannelImpl implements TeleChannel {
         }
 
         @Override
+        /**
+         * Update the internal map containing the members' names, then notify the
+         * observers
+         */
         public void viewAccepted(View view) {
-            // TODO need to store the view, so can be queried later
-            return;
+            Vector<Address> members = view.getMembers();
+            memberMap.clear();
+            for (Address addr :members) {
+                memberMap.put(addr.toString(), addr);
+            }
+            notifyViewObservers();
         }
         
     }

@@ -6,18 +6,20 @@ package teletutor.core.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
+import teletutor.core.utilities.FieldUtil;
 
 /**
  * The base class for all objects that can register a subchannel on the TeleChannel. 
  * Instances of TeleObjects with the same name (across JGroups instances) form a
  * messaging group
- * @author Rae
+ * @author Sabin Timalsena
  */
 public abstract class TeleObject {
     /**
@@ -26,7 +28,19 @@ public abstract class TeleObject {
     private String name = null;
     private TeleChannel channel = null;
     
-    public TeleObject () {
+    /**
+     * The map used to record the changes that are propagated across the network
+     */
+    private UpdateInfo updateInfo = new UpdateInfo();
+    
+    /**
+     * Construct a new TeleObject to communicate on the given channel
+     * @param name A unique name for the object. Make sure you don't pass null
+     * @param chan The channel to send/receive messages on
+     */
+    public TeleObject (String name, TeleChannel chan) throws Exception {
+        this.name = name;
+        registerSubChannel(chan);
     }
     
     public final void setName(String name) {
@@ -73,6 +87,20 @@ public abstract class TeleObject {
     }
     
     /**
+     * Send the message only to a particular member of the group.
+     * @param member
+     * @param obj
+     * @throws Exception 
+     */
+    public void sendObject(String member, Serializable obj) throws Exception {
+        if (channel == null) {
+            System.out.println("Null Channel");
+            return;
+        }
+        channel.send(member, this, obj);
+        System.out.println("sent..");
+    }
+    /**
      * A callback to handle the received object.
      * Note: check the class (instanceof) the object to make sure it indeed is
      * a message for this TeleObject.
@@ -89,19 +117,94 @@ public abstract class TeleObject {
      * WARNING: The object must be Serializable or Externalizable.
      * The Object Stream is from offset + 1 to offset + length - 1
      * For other types, see Message.java --> getObject() method. 
+     * 
+     * This method is for callback purposes and will be called automatically by
+     * the TeleChannel.
      */
     public final void receivedBytes(final byte[] buf, int offset, int length) {
-        System.out.println("Received ze byte array: " + offset + ":"+ length);
-        
         try {
             ClassLoaderObjectInputStream in = new ClassLoaderObjectInputStream(this.getClass().getClassLoader(),
                     new ByteArrayInputStream(buf, offset + 1, length -1));
-            received(in.readObject());
+            Object obj = in.readObject();
             in.close();
+            
+            // check if the object is meant for updating properties
+            if (obj instanceof UpdateInfo) {
+                update((UpdateInfo)obj);
+            } else {
+                received(obj);
+            }
         } catch (IOException ex) {
             Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "Could not unmarshall message payload: {0}", ex.getMessage());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "Could not load Class: {0}", ex.getMessage());
+        }
+    }
+    
+    /**
+     * Update the map containing field name/value pairs with the new data, for a 
+     * given field. To be used in the SETTER methods.
+     * @param fieldName 
+     */
+    protected final void registerFieldChange (String fieldName, Serializable value) {
+        updateInfo.put(fieldName, value);
+    }
+    
+    /**
+     * Send the changes (the updateInfo map) across the network, so the 
+     * corresponding objects on the other ends can get the changes.
+     */
+    public final void flushChanges () {
+        try {
+            sendObject(updateInfo);
+            updateInfo.clear();
+        } catch (Exception ex) {
+            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "Failed to flush object properties.", ex);
+        }
+    }
+    
+    /**
+     * Update this properties based on the key/value pairs obtained from the network.
+     * Or elsewhere.
+     * @param changes 
+     */
+    public final void update(UpdateInfo changes) {
+        Set<String> keySet = changes.keySet();
+        for (String field: keySet) {
+            setField(field, changes.get(field));
+        }
+    }
+    
+    /**
+     * This method uses reflection to set one of its fields to a given value
+     * @param obj
+     * @param fieldName
+     * @param value 
+     */
+    protected final void setField(String fieldName, Object value) {
+        Class cls = this.getClass();
+        
+        // TODO or maybe check the superclasses just as high as the TeleObject 
+        // class
+        while (cls.getSuperclass() != null) {
+            System.out.println(cls.getName());
+            
+            try {
+                Field field = cls.getDeclaredField(fieldName);
+                field.set(this, value);
+                break;
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchFieldException ex) {
+                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            // if field not found in this class, check the superclass
+            cls = cls.getSuperclass();
         }
     }
 }

@@ -14,33 +14,26 @@ import teletutor.core.services.TeleChannel;
 
 /**
  *
- * @author Rae
+ * @author Sabin Timalsena
  */
 public class Activator implements BundleActivator {
     TeleChannelImpl chan = null;
     static BundleContext bc = null;
     
-    // TODO remove this
-    String testString;
-    
     @Override
     public void start(BundleContext bContext) throws Exception {
         Activator.bc = bContext;
-        testString = "Aye Captian.";
         
-        //Thread.currentThread().setContextClassLoader(ClassConfigurator.class.getClassLoader());
-        // register the SubChannelHeader
-        //Class headerClass = Class.forName("teletutor.core.impl.SubChannelHeader", true, SubChannelHeader.class.getClassLoader());
+        // this needs to be done in order to be able to add a header to the 
+        // JGroups messages
         try {
             ClassConfigurator.add((short)2000, SubChannelHeader.class);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        //ClassConfigurator.add()
         
         // create the channel
-        chan = new TeleChannelImpl();
-        chan.createChannel("settings/UDP.xml", "TestGroup", "Heme Poudel");
+        chan = new TeleChannelImpl("settings/UDP.xml", "TestGroup", "Heme Poudel");
         
         bc.registerService(TeleChannel.class.getName(), (TeleChannel) chan, new Hashtable());
     }
