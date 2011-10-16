@@ -4,11 +4,12 @@
  */
 package teletutor.core.services;
 
+import java.util.Set;
 
 /**
  *
- * @author Rae
+ * @author Sabin Timalsena
  */
 public interface ViewObserver {
-
+    void newViewArrived(Set<String> memberList);
 }

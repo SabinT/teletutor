@@ -7,8 +7,12 @@ package teletutor.core.services;
 
 /**
  *
- * @author Rae
+ * @author Sabin Timalsena
  */
 public interface ViewObservable {
+    void addViewObserver(ViewObserver obs);
     
+    void removeViewObserver(ViewObserver obs);
+    
+    void notifyViewObservers();
 }
