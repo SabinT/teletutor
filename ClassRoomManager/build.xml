@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="PROJECT_NAME_HERE" default="1. Jar Only" xmlns:bundlor="antlib:com.springsource.bundlor.ant">
+<project name="ClassroomManager" default="1. Jar Only" xmlns:bundlor="antlib:com.springsource.bundlor.ant">
     <!--
         jar:        generate jar file from compiled sources with an EMPTY manifest file
         
