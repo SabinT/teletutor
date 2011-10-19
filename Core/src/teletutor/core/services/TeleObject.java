@@ -26,7 +26,7 @@ public abstract class TeleObject {
      * The name must contain 8-bit characters.
      */
     private String name = null;
-    private TeleChannel channel = null;
+    protected TeleChannel channel = null;
     
     /**
      * The map used to record the changes that are propagated across the network
@@ -59,7 +59,11 @@ public abstract class TeleObject {
      */
     public final void registerSubChannel (TeleChannel chan) throws Exception {
         if (name == null) throw new Exception("Name of Object has not been set yet");
-        
+        if (chan == null) {
+            channel = chan;
+            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "Supplied empty TeleChannel.");
+            return;
+        }
         // remove old registration
         unregisterSubChannel();
         chan.registerSubChannel(this);
@@ -67,8 +71,25 @@ public abstract class TeleObject {
         this.channel = chan;
     }
     
+    /**
+     * Called when the object no longer needs to be on the network; typically when
+     * it is being destroyed.
+     */
     public final void unregisterSubChannel() {
         if (channel != null) channel.unregisterSubChannel(this);
+    }
+    
+    public final TeleChannel getChannel() {
+        return channel;
+    }
+    
+    /**
+     * Used to check is the node that this object is residing in is the node of
+     * the Tutor, i.e. if the channel name is the same as the tutor name
+     * @return 
+     */
+    public boolean isOnTutorNode () {
+        return (channel.getChannelName().equals(channel.getTutorName()));
     }
     
     /**
@@ -79,11 +100,10 @@ public abstract class TeleObject {
      */
     public void sendObject(Serializable obj) throws Exception {
         if (channel == null) {
-            System.out.println("Null Channel");
+            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
             return;
         }
-        channel.send(this, obj);
-        System.out.println("sent..");
+        channel.send(this.getName(), obj);
     }
     
     /**
@@ -94,12 +114,25 @@ public abstract class TeleObject {
      */
     public void sendObject(String member, Serializable obj) throws Exception {
         if (channel == null) {
-            System.out.println("Null Channel");
+            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
             return;
         }
-        channel.send(member, this, obj);
-        System.out.println("sent..");
+        channel.send(member, this.getName(), obj);
     }
+    
+    /**
+     * Send the message only to a particular member of the group, on a particular
+     * subchannel i.e. TeleObject with a particular name.
+     * @throws Exception 
+     */
+    public void sendObject(String member, String destObj, Serializable obj) throws Exception {
+        if (channel == null) {
+            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
+            return;
+        }
+        channel.send(member, destObj, obj);
+    }
+    
     /**
      * A callback to handle the received object.
      * Note: check the class (instanceof) the object to make sure it indeed is
@@ -147,6 +180,8 @@ public abstract class TeleObject {
      * @param fieldName 
      */
     protected final void registerFieldChange (String fieldName, Serializable value) {
+        // TODO maybe flush automatically if changes have not been flushed for
+        // over a second (or some such interval of time)
         updateInfo.put(fieldName, value);
     }
     
@@ -155,6 +190,8 @@ public abstract class TeleObject {
      * corresponding objects on the other ends can get the changes.
      */
     public final void flushChanges () {
+        // TODO it could be better to disallow flushing for a certain period of
+        // time after a flush has been made. Timers
         try {
             sendObject(updateInfo);
             updateInfo.clear();
@@ -173,7 +210,14 @@ public abstract class TeleObject {
         for (String field: keySet) {
             setField(field, changes.get(field));
         }
+        objectUpdated(changes);
     }
+    
+    /**
+     * A hook to allow the object to be notified of changes arriving from the network
+     * and take appropriate action
+     * @param changes 
+     */public abstract void objectUpdated(UpdateInfo changes);
     
     /**
      * This method uses reflection to set one of its fields to a given value
