@@ -16,6 +16,7 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
+import org.jgroups.conf.ClassConfigurator;
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
 import teletutor.core.services.ViewObserver;
@@ -25,12 +26,17 @@ import teletutor.core.services.ViewObserver;
  * @author Sabin Timalsena
  */
 public class TeleChannelImpl implements TeleChannel {
-    
+
     private Map<String, TeleObject> channelMap = new HashMap<String, TeleObject>();
     private JChannel channel = null;
-    
-    private TeleChannel.Privilege privilege;
-    
+    private String groupName;
+    private String channelName;
+    private String tutorName;
+    // storage and notification mechanism for class members
+    private Map<String, Address> memberMap = new HashMap<String, Address>();
+    private final Object memberLock = new Object();
+    private ArrayList<ViewObserver> viewObservers = new ArrayList<ViewObserver>();
+
     /**
      * Start the channel based on the protocol stack in the config file.
      * @param configFile The .xml file with all the protocols
@@ -41,26 +47,37 @@ public class TeleChannelImpl implements TeleChannel {
      * Note that starting a new channel is a lengthy process, and may take some time
      * @throws Exception 
      */
-    public TeleChannelImpl (String configFile, String groupName, String channelName) 
-    throws Exception
-    {
+    public TeleChannelImpl(String configFile, String groupName, String channelName)
+            throws Exception {
+        // TODO maybe instantiate the channel based on some LectureInfo object
+        // TODO retrieve the tutor name by some means
+        this.tutorName = "Heme";
+
+        try {
+            ClassConfigurator.add((short) 2000, SubChannelHeader.class);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        this.groupName = groupName;
+        this.channelName = channelName;
         try {
             channel = new JChannel(configFile);
 
             channel.setName(channelName);
 
+            // need to set the receiver before in order to get initial views
+            channel.setReceiver(new SimpleReceiver());
+
             channel.connect(groupName);
 
-            // some receiver that can demultiplex the messages into respective
-            // subchannels
-            channel.setReceiver(new SimpleReceiver());
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             throw ex;
         }
 
     }
-    
+
     public void closeChannel() {
         channel.disconnect();
         channel.close();
@@ -73,14 +90,15 @@ public class TeleChannelImpl implements TeleChannel {
             // already has an entry
             throw new Exception("TeleObject with name " + obj.getName() + " already registered.");
         }
-        
+
         channelMap.put(obj.getName(), obj);
-        System.out.println("Object Registered, class: " + obj.getClass().getName());
+        System.out.println("Object Registered, class: " + obj.getClass().getName() + ", name: " + obj.getName());
     }
 
     @Override
     public void unregisterSubChannel(TeleObject tObj) {
         channelMap.remove(tObj.getName());
+        System.out.println("Object Unregistered, class: " + tObj.getClass().getName() + ", name: " + tObj.getName());
     }
 
     /**
@@ -90,17 +108,16 @@ public class TeleChannelImpl implements TeleChannel {
      * @throws Exception 
      */
     @Override
-    public void send(TeleObject tObj, Serializable obj) throws Exception {
-        // drop the message if desired subChannel does not exist
-        if (!channelMap.containsKey(tObj.getName())) return;
-        
-        // TODO take appropriate action based on the privilege.
-        
+    public void send(String destObj, Serializable obj) throws Exception {
+        // do not drop the message even if desired subChannel does not exist
+        // TODO make sure is this is a good idea
+        // if (!channelMap.containsKey(destObj)) return;
+
         // include a header to identify the message subChannel
         Message msg = new Message(null, null, obj);
-        SubChannelHeader hdr = new SubChannelHeader(tObj.getName());
-        msg.putHeader((short)2000, hdr);
-        
+        SubChannelHeader hdr = new SubChannelHeader(destObj);
+        msg.putHeader((short) 2000, hdr);
+
         try {
             channel.send(msg);
         } catch (ChannelNotConnectedException ex) {
@@ -114,28 +131,27 @@ public class TeleChannelImpl implements TeleChannel {
      * Send a message on a specific subchannel (TeleObject) to a specific member
      * of the group.
      * @param member
-     * @param tObj The subchannel
+     * @param destObj The subchannel
      * @param obj The message to be sent
      * @throws Exception 
      */
     @Override
-    public void send(String memberStr, TeleObject tObj, Serializable obj) throws Exception {
-        // drop the message if desired subChannel does not exist
-        if (!channelMap.containsKey(tObj.getName())) return;
-        
-        // TODO take appropriate action based on the privilege.
-        
-        Address member = memberMap.get(memberStr);
+    public void send(String memberStr, String destObj, Serializable obj) throws Exception {
+        // if (!channelMap.containsKey(destObj)) return;
+        Address member = null;
+        synchronized (memberLock) {
+            member = memberMap.get(memberStr);
+        }
         if (member == null) {
             System.out.println("Could not find the member to send message to " + memberStr);
             return;
         }
+
         Message msg = new Message(member, null, obj);
-        
         // include a header to identify the message subChannel
-        SubChannelHeader hdr = new SubChannelHeader(tObj.getName());
-        msg.putHeader((short)2000, hdr);
-        
+        SubChannelHeader hdr = new SubChannelHeader(destObj);
+        msg.putHeader((short) 2000, hdr);
+
         try {
             channel.send(msg);
         } catch (ChannelNotConnectedException ex) {
@@ -144,48 +160,57 @@ public class TeleChannelImpl implements TeleChannel {
             throw new Exception(ex.getMessage());
         }
     }
-    
-    @Override
-    public void setPrivilege(Privilege prv) {
-        privilege = prv;
-    }
 
     @Override
-    public Privilege getPrivilege() {
-        return privilege;
-    }
-
-    // storage and notification mechanism for class members
-    private Map<String,Address> memberMap = new HashMap<String, Address>();
-    private ArrayList<ViewObserver> viewObservers = new ArrayList<ViewObserver>();
-    
-    @Override
-    public void addViewObserver(ViewObserver obs) {
+    public synchronized void addViewObserver(ViewObserver obs) {
         viewObservers.add(obs);
+        synchronized (memberLock) {
+            obs.newViewArrived(memberMap.keySet());
+        }
     }
 
     @Override
-    public void removeViewObserver(ViewObserver obs) {
+    public synchronized void removeViewObserver(ViewObserver obs) {
         viewObservers.remove(obs);
     }
 
     @Override
-    public void notifyViewObservers() {
-        for (ViewObserver obs: viewObservers) {
-            obs.newViewArrived(memberMap.keySet());
+    public synchronized void notifyViewObservers() {
+        synchronized (memberLock) {
+            for (ViewObserver obs : viewObservers) {
+                obs.newViewArrived(memberMap.keySet());
+            }
         }
+    }
+
+    @Override
+    public String getGroupName() {
+        return groupName;
+    }
+
+    @Override
+    public String getChannelName() {
+        return channelName;
+    }
+
+    @Override
+    public String getTutorName() {
+        // TODO store the name of the tutor on creation through database lookup
+        return tutorName;
     }
 
     class SimpleReceiver extends ReceiverAdapter {
 
         @Override
         public void receive(Message msg) {
-            SubChannelHeader header = (SubChannelHeader)msg.getHeader((short)2000);
+            SubChannelHeader header = (SubChannelHeader) msg.getHeader((short) 2000);
             String name = header.getSubChannelName();
             System.out.println("Received message on subchannel: " + name);
-            
+
             // drop the message if no subchannel registered
-            if (channelMap == null) return;
+            if (channelMap == null) {
+                return;
+            }
             if (channelMap.containsKey(name)) {
                 // call the appropriate callback
                 //channelMap.get(name).sayHello();
@@ -199,14 +224,15 @@ public class TeleChannelImpl implements TeleChannel {
          * observers
          */
         public void viewAccepted(View view) {
-            Vector<Address> members = view.getMembers();
-            memberMap.clear();
-            for (Address addr :members) {
-                memberMap.put(addr.toString(), addr);
+            synchronized (memberLock) {
+                Vector<Address> members = view.getMembers();
+                memberMap.clear();
+                for (Address addr : members) {
+                    memberMap.put(addr.toString(), addr);
+                }
+                notifyViewObservers();
             }
-            notifyViewObservers();
         }
-        
+        // TODO suspect messages
     }
-    
 }

@@ -6,6 +6,7 @@ package teletutor.core.test;
 
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
+import teletutor.core.services.UpdateInfo;
 
 /**
  *
@@ -32,6 +33,11 @@ public class NewObject extends TeleObject {
     public void setStr(String str) {
         this.str = str;
         registerFieldChange("str", str);
+    }
+
+    @Override
+    public void objectUpdated(UpdateInfo changes) {
+        return;
     }
     
 }
