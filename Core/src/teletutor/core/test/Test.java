@@ -4,7 +4,9 @@
  */
 package teletutor.core.test;
 
+import teletutor.core.test2.KPT;
 import teletutor.core.utilities.FieldUtil;
+
 
 /**
  *
@@ -13,8 +15,10 @@ import teletutor.core.utilities.FieldUtil;
 public class Test {
     public static void main(String[] args) {
         KPT kpt = new KPT();
-        kpt.setField("x", new Integer(20));
-        System.out.println(kpt.getX());
+        kpt.setField("y", new Integer(20));
+        System.out.println(kpt.getY());
+        
+        
         
     }
     
