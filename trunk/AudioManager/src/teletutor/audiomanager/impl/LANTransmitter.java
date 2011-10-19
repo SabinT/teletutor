@@ -29,7 +29,6 @@ package teletutor.audiomanager.impl;
  * facility. Licensee represents and warrants that it will not use or
  * redistribute the Software for such purposes.
  */
-import java.awt.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.util.logging.Level;
@@ -39,10 +38,8 @@ import javax.media.protocol.*;
 import javax.media.protocol.DataSource;
 import javax.media.format.*;
 import javax.media.control.TrackControl;
-import javax.media.control.QualityControl;
 import javax.media.rtp.*;
 import javax.media.rtp.rtcp.*;
-import com.sun.media.rtp.*;
 import java.util.Vector;
 
 public class LANTransmitter {
