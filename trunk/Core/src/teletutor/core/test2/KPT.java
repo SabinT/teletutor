@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package teletutor.core.test;
+package teletutor.core.test2;
+
+import teletutor.core.test.JPT;
 
 /**
  *

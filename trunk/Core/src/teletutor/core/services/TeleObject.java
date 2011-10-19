@@ -235,6 +235,7 @@ public abstract class TeleObject {
             
             try {
                 Field field = cls.getDeclaredField(fieldName);
+                field.setAccessible(true);
                 field.set(this, value);
                 break;
             } catch (IllegalArgumentException ex) {
