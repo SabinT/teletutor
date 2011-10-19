@@ -1,7 +1,18 @@
 Manifest-Version: 2.0
-Bundle-Name: BUNDLE_NAME_HERE
-Bundle-SymbolicName: teletutor.newbundle
-Bundle-Description: DESCRIPTION_HERE
-Bundle-Vendor: WHATCHA_NAME
-Bundle-Activator: teletutor.newbundle.Activator
+Bundle-Name: AudioManager
+Bundle-SymbolicName: teletutor.audiomanager
+Bundle-Description: Handles transmission and palyback of audio
+Bundle-Vendor: Chaos Studios
+Bundle-Activator: teletutor.audiomanager.Activator
 Bundle-Category: Teletutor
+Excluded-Exports: *
+Export-Package: teletutor.audiomanager.services
+Import-Template: com.ms.awt;resolution:=optional,
+ com.ms.security;resolution:=optional,
+ com.ibm.media.parser.video;resolution:=optional,com.sun.media.content.audio.midi;resolution:=optional
+ ,com.sun.media.content.video.mpeg;resolution:=optional,com.sun.media.protocol.dsound;resolution:=optional
+ ,com.sun.media.util;resolution:=optional,javax.swing
+ ,javax.swing.border,javax.swing.text,
+ jmapps.export;resolution:=optional,jmapps.jmstudio;resolution:=optional,jm
+ apps.registry;resolution:=optional,jmapps.rtp;resolution:=optional,jmapps.ui;resolution:=optional,jmapps.util;resolution:=optional
+Bundle-Classpath: .,jmf.jar,sound.jar
