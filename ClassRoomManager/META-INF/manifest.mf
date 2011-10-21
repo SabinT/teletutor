@@ -1,1 +1,25 @@
 Manifest-Version: 2.0
+Export-Package: teletutor.classroommanager;version="1.0.0";uses:="org.
+ osgi.framework,org.osgi.util.tracker,teletutor.core.services",teletut
+ or.classroommanager.UI;version="1.0.0";uses:="javax.swing,teletutor.c
+ lassroommanager.impl,teletutor.classroommanager.services,teletutor.co
+ re.services",teletutor.classroommanager.impl;version="1.0.0";uses:="j
+ avax.swing,teletutor.classroommanager.UI,teletutor.classroommanager.s
+ ervices,teletutor.core.services",teletutor.classroommanager.services;
+ version="1.0.0",teletutor.classroommanager.test;version="1.0.0",telet
+ utor.core.test;version="1.0.0"
+Bundle-Category: Teletutor
+Tool: Bundlor 1.0.0.RELEASE
+Bundle-Name: ClassroomManager
+Created-By: 1.7.0-ea-b138 (Oracle Corporation)
+Bundle-Vendor: Chaos Studios
+Ant-Version: Apache Ant 1.8.2
+Bundle-Version: 1.0.0
+Bundle-Activator: teletutor.classroommanager.Activator
+Bundle-Description: Manages and coordinates the group activity and pri
+ vileges of the class/lecture
+Import-Package: javax.swing,javax.swing.border,org.osgi.framework,org.
+ osgi.util.tracker,teletutor.core.impl;resolution:="optional",teletuto
+ r.core.services,teletutor.core.test;resolution:="optional"
+Bundle-SymbolicName: teletutor.classroommanager
+

@@ -31,7 +31,7 @@ public class MemberListPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 listPanel.add(mProxy.getThumbPanel());
-                listPanel.repaint();
+                listPanel.revalidate();
             }
         });
     }
@@ -41,7 +41,7 @@ public class MemberListPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 listPanel.remove(mProxy.getThumbPanel());
-                listPanel.repaint();
+                listPanel.revalidate();
             }
         });
     }

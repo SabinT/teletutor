@@ -4,21 +4,11 @@
  */
 package teletutor.classroommanager.test;
 
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jgroups.JChannel;
-import org.jgroups.ReceiverAdapter;
-import org.jgroups.View;
-import org.jgroups.conf.ClassConfigurator;
 import teletutor.classroommanager.UI.ClassroomFrame;
 import teletutor.classroommanager.impl.ClassroomManager;
-import teletutor.core.impl.SubChannelHeader;
 import teletutor.core.impl.TeleChannelImpl;
-import teletutor.core.services.TeleChannel;
-import teletutor.core.services.ViewObserver;
-import teletutor.core.test.NewMessage;
-import teletutor.core.test.NewObject;
 
 /**
  *

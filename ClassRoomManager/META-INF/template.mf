@@ -5,3 +5,5 @@ Bundle-Description: Manages and coordinates the group activity and privileges of
 Bundle-Vendor: Chaos Studios
 Bundle-Activator: teletutor.classroommanager.Activator
 Bundle-Category: Teletutor
+Import-Template: teletutor.core.impl;resolution:=optional,
+ teletutor.core.test;resolution:=optional
