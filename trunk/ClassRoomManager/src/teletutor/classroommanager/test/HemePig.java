@@ -11,7 +11,6 @@ import teletutor.classroommanager.impl.ClassroomManager;
 import teletutor.classroommanager.UI.MemberProxy;
 import teletutor.core.impl.TeleChannelImpl;
 import teletutor.core.services.TeleChannel;
-import teletutor.core.test.NewObject;
 
 /**
  *
