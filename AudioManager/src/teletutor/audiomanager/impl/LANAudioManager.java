@@ -4,6 +4,9 @@
  */
 package teletutor.audiomanager.impl;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.media.MediaLocator;
 import teletutor.audiomanager.services.AudioManager;
 import teletutor.core.services.SimpleMessage;
 import teletutor.core.services.TeleChannel;
@@ -19,31 +22,61 @@ import teletutor.core.services.UpdateInfo;
 public class LANAudioManager extends TeleObject implements AudioManager {
 
     // entitities needed for reception and playback.    
-    private LANTransmitter transmitter;
-    private LANReceiver receiver;
+    private AVTransmit2 transmitter;
+    private AVReceive2 receiver;
+//    private LANTransmitter transmitter;
+//    private LANReceiver receiver;
     String mcastAddress;
     int port;
-
-    public LANAudioManager(String name, TeleChannel chan, String mcastAddress, int port) throws Exception {
+    String cname;
+    
+    public LANAudioManager(String name, TeleChannel chan, String mcastAddress, int port, String cname) throws Exception {
         super(name, chan);
         this.mcastAddress = mcastAddress;
         this.port = port;
+        this.cname = cname;
     }
 
     @Override
     public void initialize() throws Exception {
-        transmitter = new LANTransmitter(mcastAddress, port);
-        String error = transmitter.start();
-        if (error != null) {
-            throw new Exception("Could not initialize transmitter. Error: " + error);
-        }
+//        transmitter = new LANTransmitter(mcastAddress, port);
+//        String error = transmitter.initialize();
+//        if (error != null) {
+//            throw new Exception("Could not initialize transmitter. Error: " + error);
+//        }
+//
+//        receiver = new LANReceiver(mcastAddress + '/' + port);
+//        // TODO maybe initialize with the same RTPManager as Transmitter
+//        if (!receiver.initialize()) {
+//            throw new Exception("Could not initialize receiver.");
+//        }
 
-        receiver = new LANReceiver(mcastAddress + '/' + port);
-        if (!receiver.initialize(transmitter.getRTPManager())) {
+        transmitter = new AVTransmit2(new MediaLocator("dsound://8000"), mcastAddress, Integer.toString(port), null, cname);
+        String error = transmitter.initialize();
+        if (error != null) {
+            transmitter = new AVTransmit2(new MediaLocator("javasound://8000"), mcastAddress, Integer.toString(port), null, cname);
+            error = transmitter.initialize();
+            if (error != null) {
+                throw new Exception("Could not initialize transmitter. Error: " + error);
+            }
+        }
+        
+        // do not transmit unless resume() is called
+        // transmitter.resume();
+
+        String[] sessions = new String[1];
+        sessions[0] = mcastAddress + '/' + port;
+        receiver = new AVReceive2(sessions, cname);
+        // TODO maybe initialize with the same RTPManager as Transmitter
+        if (!receiver.initialize()) {
             throw new Exception("Could not initialize receiver.");
         }
     }
 
+    /** 
+     * Call this method when transmission no longer required. For temporary 
+     * suspension, use @pause() and @resume() instead.
+     */
     @Override
     public void stop() {
         transmitter.stop();
@@ -66,29 +99,28 @@ public class LANAudioManager extends TeleObject implements AudioManager {
     }
 
     public static void main(String[] args) {
-//        try {
-//            LANAudioManager mgr = new LANAudioManager("AudioManager", null, "224.144.251.104", 22200);
-//            mgr.initialize();
-//        } catch (Exception ex) {
-//            Logger.getLogger(LANAudioManager.class.getName()).log(Level.SEVERE, null, ex);
-//            System.exit(0);
-//        }
-//        
-//        mgr.resume();
-//        
-//        try {
-//            Thread.currentThread().sleep(60000);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(LANAudioManager.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
-//        mgr.stop();
+        try {
+            LANAudioManager mgr = new LANAudioManager("AudioManager", null, "224.144.251.104", 22200, "Heme");
+            mgr.initialize();
+            mgr.resume();
+
+            try {
+                Thread.currentThread().sleep(60000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(LANAudioManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            mgr.stop();
+        } catch (Exception ex) {
+            Logger.getLogger(LANAudioManager.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
+        }
     }
 
     @Override
     public void received(Object obj) {
         if (obj instanceof SimpleMessage) {
-            String msg = ((SimpleMessage)obj).getMessage();
+            String msg = ((SimpleMessage) obj).getMessage();
             if (msg.equals("pause")) {
                 pause();
             } else if (msg.equals("resume")) {

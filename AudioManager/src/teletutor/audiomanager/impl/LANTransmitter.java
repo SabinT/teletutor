@@ -52,7 +52,7 @@ public class LANTransmitter {
     private RTPManager rtpMgr;
     private DataSource dataOutput = null;
     
-    // to control the transmission, call stop or start on this SendStream
+    // to control the transmission, call stop or initialize on this SendStream
     private SendStream sendStream;
 
     public LANTransmitter( String ipAddress, int pb) {
@@ -64,7 +64,7 @@ public class LANTransmitter {
      * Starts the transmission. Returns null if transmission started ok.
      * Otherwise it returns a string with the reason why the setup failed.
      */
-    public synchronized String start() {
+    public synchronized String initialize() {
         String result;
 
         // Create a processor for the specified media locator
@@ -361,7 +361,7 @@ public class LANTransmitter {
     public static void main(String[] args) {
         LANTransmitter at = new LANTransmitter("224.144.251.104", 22200);
         // Start the transmission
-        String result = at.start();
+        String result = at.initialize();
 
         // result will be non-null if there was an error. The return
         // value is a String describing the possible error. Print it.
