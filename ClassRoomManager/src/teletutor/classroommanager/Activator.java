@@ -85,6 +85,7 @@ public class Activator implements BundleActivator {
             @Override
             public void run() {
                 if (frame != null) {
+                    frame.setVisible(false);
                     frame.dispose();
                     frame = null;
                 }

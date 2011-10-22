@@ -15,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import teletutor.classroommanager.impl.MemberThumbPanel;
 import teletutor.classroommanager.services.MemberStateObserver;
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
