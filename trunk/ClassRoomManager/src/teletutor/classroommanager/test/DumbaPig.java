@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import teletutor.classroommanager.UI.ClassroomFrame;
 import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.core.UI.CoreFrame;
 import teletutor.core.impl.TeleChannelImpl;
 import teletutor.core.services.TeleChannel;
 
@@ -16,14 +17,14 @@ import teletutor.core.services.TeleChannel;
  * @author Sabin Timalsena
  */
 public class DumbaPig {
-    static TeleChannel chan;
+
     public static void main(String[] args) {
         
         try {
             
-            chan = new TeleChannelImpl("../../settings/UDP.xml", "TestGroup", "Dumba");
+            CoreFrame coreFrame = new CoreFrame();
 
-            ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
+            ClassroomManager crman = new ClassroomManager("ClassroomManager", coreFrame.getChannel());
             ClassroomFrame frame =  new ClassroomFrame(crman);
             frame.setVisible(true);
             

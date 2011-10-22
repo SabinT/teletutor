@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import teletutor.classroommanager.UI.ClassroomFrame;
 import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.core.UI.CoreFrame;
 import teletutor.core.impl.TeleChannelImpl;
 
 /**
@@ -20,11 +21,11 @@ public class GandhiPig {
    
         try {
             
-            TeleChannelImpl chan = new TeleChannelImpl("../../settings/UDP.xml", "TestGroup", "Gandhi");
+            CoreFrame coreFrame = new CoreFrame();
 
-            ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
-            ClassroomFrame frame =  new ClassroomFrame(crman);
-            frame.setVisible(true);
+//            ClassroomManager crman = new ClassroomManager("ClassroomManager", coreFrame.getChannel());
+//            ClassroomFrame frame =  new ClassroomFrame(crman);
+//            frame.setVisible(true);
                         
 //            Thread.currentThread().sleep(60000);
 //

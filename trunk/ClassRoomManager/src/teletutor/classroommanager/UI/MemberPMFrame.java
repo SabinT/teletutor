@@ -10,6 +10,7 @@
  */
 package teletutor.classroommanager.UI;
 
+import teletutor.core.utilities.FrameUtil;
 import javax.swing.SwingUtilities;
 import teletutor.classroommanager.services.TextMessage;
 import teletutor.classroommanager.services.TextMessageObserver;
@@ -34,6 +35,7 @@ public class MemberPMFrame extends javax.swing.JFrame implements TextMessageObse
         setVisible(false);
         
         setTitle(memberProxy.getLocalUser() + "-side " + memberProxy.getUsername() + "_proxy");
+        FrameUtil.centerFrameOnScreen(this);
     }
 
     /** This method is called from within the constructor to

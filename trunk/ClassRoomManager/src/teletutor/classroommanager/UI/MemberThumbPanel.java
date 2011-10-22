@@ -1,4 +1,4 @@
-package teletutor.classroommanager.impl;
+package teletutor.classroommanager.UI;
 
 import teletutor.classroommanager.UI.MemberProxy;
 import java.util.logging.Level;
@@ -13,7 +13,8 @@ import teletutor.core.services.SimpleMessage;
  */
 public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateObserver {
     // TODO the controls and the methods to handle CURIOSITY aka the MemberProxy.STUDENT_CURIOUS state
-
+    // TODO the picture in the thumbnail, if not available in database, use from local store
+    
     MemberProxy mProxy;
 
     /** Creates new form MemberThumbPanel */
@@ -50,6 +51,7 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
         pmButton = new javax.swing.JButton();
         imagePanel = new javax.swing.JPanel();
         nameLabel = new javax.swing.JLabel();
+        stateText = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -62,9 +64,8 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        setMaximumSize(new java.awt.Dimension(120, 120));
+        setMaximumSize(new java.awt.Dimension(145, 207));
         setMinimumSize(new java.awt.Dimension(120, 120));
-        setPreferredSize(new java.awt.Dimension(120, 120));
 
         audioButton.setText("A");
         audioButton.addActionListener(new java.awt.event.ActionListener() {
@@ -96,7 +97,11 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
             .addGap(0, 68, Short.MAX_VALUE)
         );
 
+        nameLabel.setFont(new java.awt.Font("Cambria", 0, 14)); // NOI18N
         nameLabel.setText("Member Name");
+
+        stateText.setForeground(new java.awt.Color(0, 0, 153));
+        stateText.setText("Status");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -109,15 +114,18 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
                         .addComponent(jToggleButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(pmButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(audioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(26, 26, 26))))
+                        .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(pmButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(audioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(26, 26, 26))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                        .addGap(26, 26, 26))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(stateText)
+                        .addContainerGap(79, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,9 +137,11 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(pmButton))
                     .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(11, 11, 11)
                 .addComponent(nameLabel)
-                .addGap(53, 53, 53)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(stateText)
+                .addGap(41, 41, 41)
                 .addComponent(jToggleButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -178,6 +188,7 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JButton pmButton;
+    private javax.swing.JLabel stateText;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -190,12 +201,16 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
         // TODO change appearance based on member state changes
         switch (memberState) {
             case MemberProxy.STUDENT_ACTIVE:
+                stateText.setText("Active Student");
                 break;
             case MemberProxy.STUDENT_PASSIVE:
+                stateText.setText("Passive Student");
                 break;
             case MemberProxy.STUDENT_CURIOUS:
+                 stateText.setText("Curious");
                 break;
             case MemberProxy.TUTOR:
+                 stateText.setText("Tutor");
                 break;
             case MemberProxy.SUSPECT:
                 // TODO disable the controls on this event, re-enable later
