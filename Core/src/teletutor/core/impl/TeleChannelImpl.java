@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jgroups.Address;
 import org.jgroups.ChannelClosedException;
 import org.jgroups.ChannelNotConnectedException;
@@ -17,9 +19,12 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 import org.jgroups.conf.ClassConfigurator;
+import teletutor.core.services.CoreMessenger;
+import teletutor.core.services.SimpleMessage;
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
 import teletutor.core.services.ViewObserver;
+import teletutor.core.utilities.LectureBean;
 
 /**
  *
@@ -32,6 +37,7 @@ public class TeleChannelImpl implements TeleChannel {
     private String groupName;
     private String channelName;
     private String tutorName;
+    private LectureBean lecture;
     // storage and notification mechanism for class members
     private Map<String, Address> memberMap = new HashMap<String, Address>();
     private final Object memberLock = new Object();
@@ -47,11 +53,11 @@ public class TeleChannelImpl implements TeleChannel {
      * Note that starting a new channel is a lengthy process, and may take some time
      * @throws Exception 
      */
-    public TeleChannelImpl(String configFile, String groupName, String channelName)
+    public TeleChannelImpl(String configFile, LectureBean lecture, String channelName)
             throws Exception {
-        // TODO maybe instantiate the channel based on some LectureInfo object
-        // TODO retrieve the tutor name by some means
-        this.tutorName = "Heme";
+
+        this.lecture = lecture;
+        this.tutorName = lecture.getTutor();
 
         try {
             ClassConfigurator.add((short) 2000, SubChannelHeader.class);
@@ -59,7 +65,7 @@ public class TeleChannelImpl implements TeleChannel {
             System.out.println(ex.getMessage());
         }
 
-        this.groupName = groupName;
+        this.groupName = "Lecture_" + lecture.getLectureID();
         this.channelName = channelName;
         try {
             channel = new JChannel(configFile);
@@ -199,6 +205,16 @@ public class TeleChannelImpl implements TeleChannel {
         return tutorName;
     }
 
+    @Override
+    public LectureBean getLecture() {
+        return lecture;
+    }
+
+    @Override
+    public boolean isTutorChannel() {
+        return (tutorName.equals(channelName));
+    }
+
     class SimpleReceiver extends ReceiverAdapter {
 
         @Override
@@ -229,6 +245,16 @@ public class TeleChannelImpl implements TeleChannel {
                 memberMap.clear();
                 for (Address addr : members) {
                     memberMap.put(addr.toString(), addr);
+                }
+
+                // check if the tutor is present in the new view; if not, send
+                // a LEAVE_LECTURE message to the CoreMessenger
+                if (!memberMap.containsKey(tutorName)) {
+                    try {
+                        send(channelName, CoreMessenger.class.getCanonicalName(), new SimpleMessage(CoreMessenger.LEAVE_LECTURE));
+                    } catch (Exception ex) {
+                        Logger.getLogger(TeleChannelImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
                 notifyViewObservers();
             }
