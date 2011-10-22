@@ -1,5 +1,6 @@
 Manifest-Version: 2.0
-Export-Package: teletutor.core.services
+Export-Package: teletutor.core.services,teletutor.core.utilities,telet
+ utor.core.UI
 Bundle-Classpath: .,jgroups-2.12.1.Final.jar
 Bundle-Category: Teletutor
 Tool: Bundlor 1.0.0.RELEASE

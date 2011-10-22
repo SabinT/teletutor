@@ -5,7 +5,7 @@
 package teletutor.core.services;
 
 import java.io.Serializable;
-import org.jgroups.Address;
+import teletutor.core.utilities.LectureBean;
 
 /**
  *
@@ -26,5 +26,9 @@ public interface TeleChannel extends ViewObservable {
     String getChannelName();
     
     String getTutorName();
+    
+    LectureBean getLecture();
+    
+    boolean isTutorChannel();
     
 }

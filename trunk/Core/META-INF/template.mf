@@ -6,7 +6,7 @@ Bundle-Vendor: Rae
 Bundle-Activator: teletutor.core.Activator
 Bundle-Category: Teletutor
 Excluded-Exports: *
-Export-Package: teletutor.core.services
+Export-Package: teletutor.core.services, teletutor.core.utilities, teletutor.core.UI
 Import-Template: bsh;version="[1.2.3, 1.3.0)";resolution:=optional,
  org.testng.annotations;resolution:=optional,
  org.testng;resolution:=optional,
