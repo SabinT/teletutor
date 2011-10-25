@@ -26,18 +26,21 @@ import teletutor.core.services.ViewObserver;
  * @author Sabin Timalsena
  */
 public class ClassroomManager extends TeleObject implements ViewObserver, TextMessageObservable {
+
     /**
      * a map containing the current members' names and proxy objects
      */
     Map<String, MemberProxy> memberMap = new HashMap<String, MemberProxy>();
     // TODO maybe maintain a separate reference to the tutor proxy
-    
     // the visual component showing the list of students
-    MemberListPanel memberListPanel = new MemberListPanel();
+    MemberListPanel memberListPanel;
 
     public ClassroomManager(String name, TeleChannel chan) throws Exception {
         super(name, chan);
+        memberListPanel = new MemberListPanel(this);
+
         chan.addViewObserver(this);
+
     }
 
     /**
@@ -62,41 +65,41 @@ public class ClassroomManager extends TeleObject implements ViewObserver, TextMe
      */
     @Override
     public synchronized void newViewArrived(Set<String> newMemberSet) {
-            Set<String> memberSet = memberMap.keySet();
+        Set<String> memberSet = memberMap.keySet();
 
-            // first add the new members        
-            for (String memberName : newMemberSet) {
-                if (!memberSet.contains(memberName)) {
-                    try {
-                        // add new MemberProxy
-                        MemberProxy newProxy = new MemberProxy(memberName + "_proxy", getChannel());
-                        newProxy.init(memberName);
-                        memberMap.put(memberName, newProxy);
+        // first add the new members        
+        for (String memberName : newMemberSet) {
+            if (!memberSet.contains(memberName)) {
+                try {
+                    // add new MemberProxy
+                    MemberProxy newProxy = new MemberProxy(memberName + "_proxy", getChannel());
+                    newProxy.init(memberName);
+                    memberMap.put(memberName, newProxy);
 
-                        // setup visual components too, add them to a panel
-                        memberListPanel.addMember(newProxy);
-                    } catch (Exception ex) {
-                        Logger.getLogger(ClassroomManager.class.getName()).log(Level.SEVERE, "Could not register new member: " + memberName, ex);
-                    }
+                    // setup visual components too, add them to a panel
+                    memberListPanel.addMember(newProxy);
+                } catch (Exception ex) {
+                    Logger.getLogger(ClassroomManager.class.getName()).log(Level.SEVERE, "Could not register new member: " + memberName, ex);
                 }
             }
+        }
 
-            // then remove any members that disconnected
-            Set<String> toRemove = new HashSet<String>();
-            for (String memberName : memberSet) {
-                if (!newMemberSet.contains(memberName)) {
-                    // remove everything associated with that member
-                    MemberProxy deadMember = memberMap.get(memberName);
-                    deadMember.dispose();
-                    
-                    toRemove.add(memberName);
-                }
+        // then remove any members that disconnected
+        Set<String> toRemove = new HashSet<String>();
+        for (String memberName : memberSet) {
+            if (!newMemberSet.contains(memberName)) {
+                // remove everything associated with that member
+                MemberProxy deadMember = memberMap.get(memberName);
+                deadMember.dispose();
+
+                toRemove.add(memberName);
             }
-            
-            for (String memberName: toRemove) {
-                memberMap.remove(memberName);
-            }
-        
+        }
+
+        for (String memberName : toRemove) {
+            memberMap.remove(memberName);
+        }
+
     }
     /**
      * The mechanism for registration and notification of observers on new PM 
@@ -141,9 +144,12 @@ public class ClassroomManager extends TeleObject implements ViewObserver, TextMe
     public synchronized MemberProxy getMemberProxy(String username) {
         return memberMap.get(username);
     }
+    
+    public synchronized MemberProxy gteLocalProxy() {
+        return memberMap.get(getChannel().getChannelName());
+    }
 
     public MemberListPanel getMemberListPanel() {
         return memberListPanel;
     }
-    
 }

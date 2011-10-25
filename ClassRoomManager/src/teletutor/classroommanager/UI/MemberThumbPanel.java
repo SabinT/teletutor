@@ -3,6 +3,7 @@ package teletutor.classroommanager.UI;
 import teletutor.classroommanager.UI.MemberProxy;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JToggleButton;
 import teletutor.classroommanager.services.MemberStateObserver;
 import teletutor.core.services.SimpleMessage;
 
@@ -10,6 +11,7 @@ import teletutor.core.services.SimpleMessage;
  * The control that serves as a thumbnail for the member, and also provides 
  * functions of controlling audio transmission and sending PM
  * @author Sabin Timalsena
+ * @deprecated Use the MemberThumb component instead
  */
 public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateObserver {
     // TODO the controls and the methods to handle CURIOSITY aka the MemberProxy.STUDENT_CURIOUS state
@@ -34,6 +36,8 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
         if (!mProxy.isOnTutorNode() || mProxy.isTutor()) {
             audioButton.setEnabled(false);
         }
+        
+        JToggleButton tb = new JToggleButton();
     }
 
     /** This method is called from within the constructor to
@@ -125,7 +129,7 @@ public class MemberThumbPanel extends javax.swing.JPanel implements MemberStateO
                         .addGap(26, 26, 26))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(stateText)
-                        .addContainerGap(79, Short.MAX_VALUE))))
+                        .addContainerGap(91, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

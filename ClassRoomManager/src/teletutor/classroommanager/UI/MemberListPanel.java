@@ -12,6 +12,7 @@ package teletutor.classroommanager.UI;
 
 import java.awt.FlowLayout;
 import javax.swing.SwingUtilities;
+import teletutor.classroommanager.impl.ClassroomManager;
 
 /**
  *
@@ -19,15 +20,25 @@ import javax.swing.SwingUtilities;
  */
 public class MemberListPanel extends javax.swing.JPanel {
 
+    ClassroomManager crman;
+
     /** Creates new form MemberListPanel */
-    public MemberListPanel() {
+    public MemberListPanel(ClassroomManager crman) {
         initComponents();
-        
+        this.crman = crman;
         listPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        
+        // if this is the tutor, do not show the "leave a note" fields at the
+        // bottom
+        if (crman.isOnTutorNode()) {
+            curiousButton.setVisible(false);
+            curiousNoteEdit.setVisible(false);
+        }
     }
-    
+
     public void addMember(final MemberProxy mProxy) {
         SwingUtilities.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 listPanel.add(mProxy.getThumbPanel());
@@ -35,9 +46,10 @@ public class MemberListPanel extends javax.swing.JPanel {
             }
         });
     }
-    
-    public void removeMember (final MemberProxy mProxy) {
+
+    public void removeMember(final MemberProxy mProxy) {
         SwingUtilities.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 listPanel.remove(mProxy.getThumbPanel());
@@ -59,10 +71,11 @@ public class MemberListPanel extends javax.swing.JPanel {
         scrollPane = new javax.swing.JScrollPane();
         listPanel = new javax.swing.JPanel();
         curiousButton = new javax.swing.JButton();
+        curiousNoteEdit = new javax.swing.JTextField();
 
         jLabel1.setText("List of Members:");
 
-        scrollPane.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        scrollPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         listPanel.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -70,16 +83,30 @@ public class MemberListPanel extends javax.swing.JPanel {
         listPanel.setLayout(listPanelLayout);
         listPanelLayout.setHorizontalGroup(
             listPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 399, Short.MAX_VALUE)
+            .addGap(0, 677, Short.MAX_VALUE)
         );
         listPanelLayout.setVerticalGroup(
             listPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 270, Short.MAX_VALUE)
+            .addGap(0, 416, Short.MAX_VALUE)
         );
 
         scrollPane.setViewportView(listPanel);
 
-        curiousButton.setText("Request Audio");
+        curiousButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/memberThumb/question32x32.png"))); // NOI18N
+        curiousButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        curiousButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                curiousButtonActionPerformed(evt);
+            }
+        });
+
+        curiousNoteEdit.setFont(new java.awt.Font("Cambria", 0, 17)); // NOI18N
+        curiousNoteEdit.setText("Leave a note to the tutor...");
+        curiousNoteEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                curiousNoteEditActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -88,9 +115,12 @@ public class MemberListPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
                     .addComponent(jLabel1)
-                    .addComponent(curiousButton)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(curiousNoteEdit, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(curiousButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -99,14 +129,29 @@ public class MemberListPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
-                .addComponent(curiousButton)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(curiousNoteEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(curiousButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void curiousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_curiousButtonActionPerformed
+        String cmsg = curiousNoteEdit.getText();
+        MemberProxy mp = crman.getMemberProxy(crman.getChannel().getChannelName());
+        mp.setNote(cmsg);
+        mp.setState(MemberProxy.STUDENT_CURIOUS);
+        curiousNoteEdit.setText("");
+    }//GEN-LAST:event_curiousButtonActionPerformed
+
+    private void curiousNoteEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_curiousNoteEditActionPerformed
+        curiousButtonActionPerformed(null);
+    }//GEN-LAST:event_curiousNoteEditActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton curiousButton;
+    private javax.swing.JTextField curiousNoteEdit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel listPanel;
     private javax.swing.JScrollPane scrollPane;
