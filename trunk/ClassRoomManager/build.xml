@@ -16,7 +16,7 @@
     
     <target name="init">
         <mkdir dir="out" />
-        <copy todir="out/resources" overwrite="true">
+        <copy todir="out" overwrite="true">
             <fileset dir="resources" />
         </copy>
         <copy todir="out">

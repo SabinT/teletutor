@@ -11,17 +11,27 @@ import teletutor.classroommanager.impl.ClassroomManager;
 import teletutor.classroommanager.UI.MemberProxy;
 import teletutor.core.impl.TeleChannelImpl;
 import teletutor.core.services.TeleChannel;
+import teletutor.core.utilities.LectureBean;
 
 /**
  *
  * @author Sabin Timalsena
  */
 public class HemePig {
+
     static TeleChannel chan;
+
     public static void main(String[] args) {
-        
+
         try {
- 
+
+            LectureBean lecture = new LectureBean(123, "Plutonium tatto-making", "Heme");
+            TeleChannel chan = new TeleChannelImpl("../../settings/UDP.xml", lecture, "Heme");
+
+            ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
+            ClassroomFrame frame = new ClassroomFrame(crman);
+            frame.setVisible(true);
+
 //            chan = new TeleChannelImpl("../../settings/UDP.xml", "TestGroup", "Heme");
 //            
 //            ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
@@ -52,4 +62,3 @@ public class HemePig {
         }
     }
 }
-

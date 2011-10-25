@@ -50,13 +50,17 @@ public class MemberProxy extends TeleObject implements TextMessageObservable {
      * be changed afterwards
      */
     private String username;
+    // similarly other fields    
+    
     // the user on whose node this proxy resides. This user's proxy on the other
     // end should receive messages sent by this proxy
     private String localUser;
     private String targetProxy;
-    // similarly other fields    
+    
     protected Integer state;
-    // TODO getter and setter for everything
+    // the note to be left to the tutor when raising a question
+    protected String note;
+
     MemberPMFrame pmFrame = null;
     //MemberThumbPanel thumbPanel = null;
     JPanel thumbPanel = null;
@@ -94,7 +98,7 @@ public class MemberProxy extends TeleObject implements TextMessageObservable {
             @Override
             public void run() {
                 pmFrame = new MemberPMFrame(mp);
-                thumbPanel = new MemberThumbPanel(mp);
+                thumbPanel = new MemberThumb(mp);
             }
         });
 
@@ -208,6 +212,15 @@ public class MemberProxy extends TeleObject implements TextMessageObservable {
 
     public boolean isTutor() {
         return username.equals(channel.getTutorName());
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+        registerFieldChange("note", note);
     }
 
     public JPanel getThumbPanel() {

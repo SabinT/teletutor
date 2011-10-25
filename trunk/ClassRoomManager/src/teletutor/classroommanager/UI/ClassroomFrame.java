@@ -40,6 +40,7 @@ public class ClassroomFrame extends javax.swing.JFrame {
             public void run() {
                 tabbedPane.addTab("Class View", null, crman.getMemberListPanel(), "Shows the state of the classroom, along "
                         + "with all the members");
+                tabbedPane.addTab("Discussion", null, new DiscussionPanel(crman), "Open discussion area where all members can talk to each other");
             }
         });
 
@@ -91,14 +92,14 @@ public class ClassroomFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

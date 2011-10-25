@@ -11,6 +11,7 @@ import teletutor.classroommanager.impl.ClassroomManager;
 import teletutor.core.UI.CoreFrame;
 import teletutor.core.impl.TeleChannelImpl;
 import teletutor.core.services.TeleChannel;
+import teletutor.core.utilities.LectureBean;
 
 /**
  *
@@ -22,9 +23,10 @@ public class DumbaPig {
         
         try {
             
-            CoreFrame coreFrame = new CoreFrame();
-
-            ClassroomManager crman = new ClassroomManager("ClassroomManager", coreFrame.getChannel());
+            LectureBean lecture =  new LectureBean(123, "Plutonium tatto-making", "Heme");
+            TeleChannel chan = new TeleChannelImpl("../../settings/UDP.xml", lecture, "Dumba");
+            
+            ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
             ClassroomFrame frame =  new ClassroomFrame(crman);
             frame.setVisible(true);
             
