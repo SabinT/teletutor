@@ -23,6 +23,7 @@ import teletutor.core.services.CoreMessenger;
 import teletutor.core.services.SimpleMessage;
 import teletutor.core.services.TeleChannel;
 import teletutor.core.services.TeleObject;
+import teletutor.core.services.UpdateInfo;
 import teletutor.core.services.ViewObserver;
 import teletutor.core.utilities.LectureBean;
 
@@ -260,5 +261,14 @@ public class TeleChannelImpl implements TeleChannel {
             }
         }
         // TODO suspect messages
+    }
+
+    @Override
+    public void pushMessage(String destObj, Serializable obj) {
+        if (obj instanceof UpdateInfo) {
+            channelMap.get(destObj).update((UpdateInfo) obj);
+        } else {
+            channelMap.get(destObj).received(obj);
+        }
     }
 }
