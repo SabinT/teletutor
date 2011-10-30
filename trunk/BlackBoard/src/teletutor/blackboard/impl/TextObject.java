@@ -46,11 +46,6 @@ public class TextObject extends BoardObject {
     }
 
     @Override
-    public void updateGraphics() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public JPanel getPropertiesPanel() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

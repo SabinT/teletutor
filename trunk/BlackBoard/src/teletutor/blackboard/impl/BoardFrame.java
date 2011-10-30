@@ -18,8 +18,6 @@ package teletutor.blackboard.impl;
  *
  * Created on Oct 19, 2011, 12:07:37 PM
  */
-
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.logging.Level;
@@ -27,14 +25,15 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import teletutor.blackboard.services.BlackBoard;
 
 /**
  *
  * @author msi
  */
-public class MoveTest extends javax.swing.JFrame {
+public class BoardFrame extends javax.swing.JFrame {
 
-    BlackBoardImpl board = null;
+    BlackBoard board = null;
     Rectango rec1 = null;
     Rectango rec2 = null;
     Rectango rec3 = null;
@@ -44,10 +43,12 @@ public class MoveTest extends javax.swing.JFrame {
     TextTool texter = null;
 
     /** Creates new form MoveTest */
-    public MoveTest() {
+    public BoardFrame(BlackBoard _board) {
         try {
-            board = new BlackBoardImpl("BlackBoard", null);
-            board.init(500, 500);
+//            board = new BlackBoardImpl("BlackBoard", null);
+//            board.init(500, 500);
+
+            this.board = _board;
 
             rec1 = new Rectango("Rec1", null);
             rec1.init(20, 45, 1, 100, 100, Color.red);
@@ -56,9 +57,9 @@ public class MoveTest extends javax.swing.JFrame {
             rec3 = new Rectango("Rec3", null);
             rec3.init(200, 90, 3, 60, 300, Color.ORANGE);
 
-            mover = new MoveTool("MoveTool", null);           
+            mover = new MoveTool("MoveTool", null);
             mover.init(board);
-            
+
             texter = new TextTool("TextTool", null);
             texter.init(board);
 
@@ -68,7 +69,7 @@ public class MoveTest extends javax.swing.JFrame {
 
             board.addTool(mover);
             board.addTool(texter);
-            
+
 
             java.awt.EventQueue.invokeLater(new Runnable() {
 
@@ -78,13 +79,13 @@ public class MoveTest extends javax.swing.JFrame {
                     tools = board.getToolBar();
 
                     setLayout(new BorderLayout());
-                    getContentPane().add(panel, BorderLayout.CENTER);                    
-                    getContentPane().add(tools, BorderLayout.NORTH);                    
+                    getContentPane().add(panel, BorderLayout.CENTER);
+                    getContentPane().add(tools, BorderLayout.NORTH);
                     pack();
                 }
-            });           
+            });
         } catch (Exception ex) {
-            Logger.getLogger(MoveTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BoardFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -96,7 +97,13 @@ public class MoveTest extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new MoveTest().setVisible(true);
+                try {
+                    BlackBoardImpl board = new BlackBoardImpl("BlackBoard", null);
+                    board.init(500, 500);
+                    new BoardFrame(board).setVisible(true);
+                } catch (Exception ex) {
+                    Logger.getLogger(BoardFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
