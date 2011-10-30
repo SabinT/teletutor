@@ -21,6 +21,12 @@ public interface TeleChannel extends ViewObservable {
     
     void send (String memberStr, String destObj, Serializable obj) throws Exception;
     
+    /**
+     * Used to simulate the reception of message from the network.
+     * @param obj 
+     */
+    void pushMessage (String destObject, Serializable obj);
+    
     String getGroupName();
     
     String getChannelName();
