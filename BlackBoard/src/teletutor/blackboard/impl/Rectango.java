@@ -29,7 +29,7 @@ public class Rectango extends BoardObject{
     public void init(int x, int y, int z, int width, int height, Color c){
         this.x = x;
         this.y = y;
-        this.z = z;
+        //this.z = z;
         this.width = width;
         this.height = height;
         image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -46,22 +46,32 @@ public class Rectango extends BoardObject{
     }
 
     @Override
-    public void updateGraphics() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public JPanel getPropertiesPanel() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void objectUpdated(UpdateInfo ui) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return;
     }
 
     @Override
     public void received(Object o) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void showProperties() {
+        
+    }
+
+    @Override
+    public void hideProperties() {
+        
+    }
+
+    @Override
+    public void redraw() {
+        
     }
 }

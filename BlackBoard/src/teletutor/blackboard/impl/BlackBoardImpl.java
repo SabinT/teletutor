@@ -76,32 +76,15 @@ public class BlackBoardImpl extends TeleObject implements BlackBoard {
 
     @Override
     public final void addObject(BoardObject bObject) {
-        int i;
-
-        if (bObject.getZ() < 0) {
-            if (bObjectList.isEmpty()) {
-                bObject.setZ(0);
-            } else {
-                bObject.setZ(bObjectList.get(bObjectList.size() - 1).getZ() + 1);
-
-            }
-        }
-
-        if (bObjectList.isEmpty()) {
-            bObjectList.add(bObject);
-            return;
-        }
-
-        for (i = 0; i < bObjectList.size(); i++) {
-            if (bObjectList.get(i).getZ() > bObject.getZ()) {
-                break;
-            }
-        }
-
-        bObjectList.add(i, bObject);
+        bObjectList.add(bObject);
         redraw();
     }
 
+    public final void pickObject(BoardObject bObject) {
+        bObjectList.remove(bObject);
+        bObjectList.add(bObject);
+    }
+    
     @Override
     public final void removeObject(BoardObject bObject) {
         bObjectList.remove(bObject);
