@@ -10,9 +10,10 @@
  */
 package teletutor.classroommanager.UI;
 
+import teletutor.classroommanager.services.MemberProxy;
 import java.awt.FlowLayout;
 import javax.swing.SwingUtilities;
-import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.classroommanager.services.ClassroomManager;
 
 /**
  *

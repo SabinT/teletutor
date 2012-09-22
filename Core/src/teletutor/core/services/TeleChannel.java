@@ -37,4 +37,5 @@ public interface TeleChannel extends ViewObservable {
     
     boolean isTutorChannel();
     
+    TeleObject getTeleObject(String name);
 }

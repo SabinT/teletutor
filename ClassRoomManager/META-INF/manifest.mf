@@ -1,13 +1,17 @@
 Manifest-Version: 2.0
-Export-Package: teletutor.classroommanager;version="1.0.0";uses:="org.
- osgi.framework,org.osgi.util.tracker,teletutor.core.services",teletut
- or.classroommanager.UI;version="1.0.0";uses:="javax.swing,teletutor.c
- lassroommanager.impl,teletutor.classroommanager.services,teletutor.co
- re.services",teletutor.classroommanager.impl;version="1.0.0";uses:="j
- avax.swing,teletutor.classroommanager.UI,teletutor.classroommanager.s
- ervices,teletutor.core.services",teletutor.classroommanager.services;
- version="1.0.0",teletutor.classroommanager.test;version="1.0.0",telet
- utor.core.test;version="1.0.0"
+Export-Package: icons.memberThumb;version="1.0.0",icons.memberThumb.di
+ sabled.images;version="1.0.0",icons.memberThumb.normal;version="1.0.0
+ ",icons.memberThumb.normal.images;version="1.0.0",icons.memberThumb.o
+ ver.images;version="1.0.0",icons.memberThumb.selected.images;version=
+ "1.0.0",teletutor.classroommanager;version="1.0.0";uses:="org.osgi.fr
+ amework,org.osgi.util.tracker,teletutor.core.services",teletutor.clas
+ sroommanager.UI;version="1.0.0";uses:="javax.swing,teletutor.classroo
+ mmanager.impl,teletutor.classroommanager.services,teletutor.core.serv
+ ices,teletutor.core.utilities",teletutor.classroommanager.impl;versio
+ n="1.0.0";uses:="javax.swing,teletutor.classroommanager.UI,teletutor.
+ classroommanager.services,teletutor.core.services",teletutor.classroo
+ mmanager.services;version="1.0.0",teletutor.classroommanager.test;ver
+ sion="1.0.0",teletutor.core.test;version="1.0.0"
 Bundle-Category: Teletutor
 Tool: Bundlor 1.0.0.RELEASE
 Bundle-Name: ClassroomManager
@@ -20,6 +24,7 @@ Bundle-Description: Manages and coordinates the group activity and pri
  vileges of the class/lecture
 Import-Package: javax.swing,javax.swing.border,org.osgi.framework,org.
  osgi.util.tracker,teletutor.core.impl;resolution:="optional",teletuto
- r.core.services,teletutor.core.test;resolution:="optional"
+ r.core.services,teletutor.core.test;resolution:="optional",teletutor.
+ core.utilities
 Bundle-SymbolicName: teletutor.classroommanager
 

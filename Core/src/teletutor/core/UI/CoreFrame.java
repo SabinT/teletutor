@@ -97,7 +97,6 @@ public class CoreFrame extends JFrame {
 
         Thread th = new ChannelStartThread(this);
         th.start();
-
     }
 
     public void stopChannel() {
@@ -117,6 +116,7 @@ public class CoreFrame extends JFrame {
             channel.closeChannel();
             channel = null;
         }
+        
         // TODO stop the framework bundle
         System.exit(0);
     }

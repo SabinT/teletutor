@@ -13,7 +13,7 @@ package teletutor.classroommanager.UI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.classroommanager.services.ClassroomManager;
 import teletutor.core.services.CoreMessenger;
 import teletutor.core.services.SimpleMessage;
 import teletutor.core.utilities.FrameUtil;

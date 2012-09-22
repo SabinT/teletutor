@@ -1,0 +1,24 @@
+Manifest-Version: 2.0
+Export-Package: teletutor.blackboard.expansion;version="1.0.0";uses:="
+ org.osgi.framework,org.osgi.util.tracker,teletutor.blackboard.service
+ s",teletutor.blackboard.expansion.picture;version="1.0.0";uses:="java
+ x.swing,teletutor.blackboard.services,teletutor.core.services",teletu
+ tor.blackboard.expansion.test;version="1.0.0",teletutor.blackboard.ex
+ pansion.toolpack;version="1.0.0";uses:="javax.swing,teletutor.blackbo
+ ard.services,teletutor.core.services"
+Bundle-Category: Teletutor
+Tool: Bundlor 1.0.0.RELEASE
+Bundle-Name: BoardToolPack
+Created-By: 1.7.0-ea-b138 (Oracle Corporation)
+Bundle-Vendor: Chaos Studios
+Ant-Version: Apache Ant 1.8.2
+Bundle-Version: 1.0.0
+Bundle-Activator: teletutor.blackboard.expansion.Activator
+Bundle-Description: Adds a few tools to the blackboard: Picture tool, 
+ Drawing tool
+Import-Package: javax.swing,javax.swing.border,org.osgi.framework,org.
+ osgi.util.tracker,teletutor.blackboard.impl,teletutor.blackboard.serv
+ ices,teletutor.blackboard.utilities,teletutor.core.impl;resolution:="
+ optional",teletutor.core.services,teletutor.core.utilities
+Bundle-SymbolicName: teletutor.blackboard.exapnsion
+

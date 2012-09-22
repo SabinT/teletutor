@@ -4,6 +4,7 @@
  */
 package teletutor.classroommanager.UI;
 
+import teletutor.classroommanager.services.MemberProxy;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Level;

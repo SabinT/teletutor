@@ -14,9 +14,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
-import teletutor.blackboard.impl.BlackBoardImpl;
+import teletutor.blackboard.impl.BlackboardImpl;
 import teletutor.blackboard.impl.BoardFrame;
-import teletutor.blackboard.services.BlackBoard;
+import teletutor.blackboard.services.Blackboard;
 import teletutor.core.services.TeleChannel;
 
 /**
@@ -28,7 +28,7 @@ public class Activator implements BundleActivator {
     public static BundleContext bc = null;
     public static ServiceRegistration serviceReg;
     ServiceTracker channelTracker = null;
-    BlackBoardImpl board = null;
+    BlackboardImpl board = null;
     BoardFrame frame = null;
 
     @Override
@@ -71,13 +71,13 @@ public class Activator implements BundleActivator {
 
     public void startBlackboard(TeleChannel channel) {
         try {
-            board = new BlackBoardImpl("BlackBoard", channel);
-            board.init(500, 500);
+            board = new BlackboardImpl("BlackBoard", channel);
+            board.init(800, 600);
 
             // register the board service
             if (Activator.bc != null) {
                 Activator.serviceReg =
-                        Activator.bc.registerService(BlackBoard.class.getName(), (BlackBoard) board, new Hashtable());
+                        Activator.bc.registerService(Blackboard.class.getName(), (Blackboard) board, new Hashtable());
             }
 
             frame = new BoardFrame(board);

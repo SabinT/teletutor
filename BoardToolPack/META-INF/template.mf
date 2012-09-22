@@ -1,0 +1,8 @@
+Manifest-Version: 2.0
+Bundle-Name: BoardToolPack
+Bundle-SymbolicName: teletutor.blackboard.exapnsion
+Bundle-Description: Adds a few tools to the blackboard: Picture tool, Drawing tool
+Bundle-Vendor: Chaos Studios
+Bundle-Activator: teletutor.blackboard.expansion.Activator
+Bundle-Category: Teletutor
+Import-Template: teletutor.core.impl;resolution:=optional

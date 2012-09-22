@@ -5,7 +5,7 @@
 package teletutor.blackboard.impl;
 
 import javax.swing.JToolBar;
-import teletutor.blackboard.services.BlackBoard;
+import teletutor.blackboard.services.Blackboard;
 
 /**
  *
@@ -13,9 +13,9 @@ import teletutor.blackboard.services.BlackBoard;
  */
 class ToolBar extends JToolBar {
 
-    BlackBoard board = null;
+    Blackboard board = null;
 
-    public ToolBar(BlackBoard board) {
+    public ToolBar(Blackboard board) {
         this.board = board;
     }
     

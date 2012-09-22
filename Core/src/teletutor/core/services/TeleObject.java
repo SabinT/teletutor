@@ -106,7 +106,7 @@ public abstract class TeleObject {
      */
     public void sendObject(Serializable obj) throws Exception {
         if (channel == null) {
-            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
+            Logger.getLogger(getName()).log(Level.SEVERE, "TeleChannel not set up yet: " + getName());
             return;
         }
         channel.send(this.getName(), obj);
@@ -120,7 +120,7 @@ public abstract class TeleObject {
      */
     public void sendObject(String member, Serializable obj) throws Exception {
         if (channel == null) {
-            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
+            Logger.getLogger(getName()).log(Level.SEVERE, "TeleChannel not set up yet: ");
             return;
         }
         channel.send(member, this.getName(), obj);
@@ -133,7 +133,7 @@ public abstract class TeleObject {
      */
     public void sendObject(String member, String destObj, Serializable obj) throws Exception {
         if (channel == null) {
-            Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, "TeleChannel not set up yet");
+            Logger.getLogger(getName()).log(Level.SEVERE, "TeleChannel not set up yet: " + getName());
             return;
         }
         channel.send(member, destObj, obj);
@@ -170,6 +170,7 @@ public abstract class TeleObject {
             // check if the object is meant for updating properties
             if (obj instanceof UpdateInfo) {
                 update((UpdateInfo) obj);
+                objectUpdated(updateInfo);
             } else {
                 received(obj);
             }
@@ -255,15 +256,18 @@ public abstract class TeleObject {
                 field.setAccessible(true);
                 field.set(this, value);
                 break;
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NoSuchFieldException ex) {
-                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(TeleObject.class.getName()).log(Level.INFO, ex.getMessage());
             }
+//            } catch (IllegalArgumentException ex) {
+//                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IllegalAccessException ex) {
+//                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (NoSuchFieldException ex) {
+//                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (SecurityException ex) {
+//                Logger.getLogger(TeleObject.class.getName()).log(Level.SEVERE, null, ex);
+//            }
 
             // if field not found in this class, check the superclass
             cls = cls.getSuperclass();

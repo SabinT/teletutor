@@ -10,6 +10,7 @@
  */
 package teletutor.classroommanager.UI;
 
+import teletutor.classroommanager.services.MemberProxy;
 import teletutor.core.utilities.FrameUtil;
 import javax.swing.SwingUtilities;
 import teletutor.classroommanager.services.TextMessage;

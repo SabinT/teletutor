@@ -1,6 +1,6 @@
 package teletutor.classroommanager.UI;
 
-import teletutor.classroommanager.UI.MemberProxy;
+import teletutor.classroommanager.services.MemberProxy;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JToggleButton;

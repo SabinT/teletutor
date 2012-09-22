@@ -2,10 +2,7 @@ package teletutor.blackboard.services;
 
 import java.awt.Image;
 import java.io.Serializable;
-import java.util.Set;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import teletutor.blackboard.utilities.Interpolator;
 import teletutor.core.services.TeleChannel;
@@ -22,6 +19,8 @@ import teletutor.core.services.UpdateInfo;
  */
 public abstract class BoardObject extends TeleObject implements Serializable {
 
+    static int count = 0;
+    static String prefix = "";
     /**
      * These x and y values are the TARGET values, the actual x and y values used
      * for drawing are tx and ty, the interpolated values. tx and ty gradually 
@@ -32,16 +31,41 @@ public abstract class BoardObject extends TeleObject implements Serializable {
     protected float tx, ty;
     protected Float alpha = new Float(1.0);
     protected float talpha = 1.0f;
+    protected float tw, th;
     protected Integer width, height;
     // z = -1;
     private boolean showBorder = false;
+    protected Blackboard board = null;
 
-    public BoardObject(String string, TeleChannel tc) throws Exception {
-        super(string, tc);
+    public static String generateName() {
+        return prefix + BoardObject.class.getName() + count;
     }
 
+    public BoardObject(String name, TeleChannel tc, Blackboard board) throws Exception {
+        super(name, tc);
+        this.board = board;
+        BoardObject.prefix =  name;
+        count++;
+    }
+
+    public abstract void init();
+
+    public final void init(UpdateInfo params) {
+        update(params);
+        init();
+    }
+
+    public abstract UpdateInfo getConstructionInfo();
+
+    /**
+     * This method needs to be synchronized.
+     * @param updateInfo 
+     */
     public abstract Image getImage();
 
+    /**
+     * This method needs to be synchronized.
+     */
     public abstract JPanel getPropertiesPanel();
 
     public float getAlpha() {
@@ -74,26 +98,19 @@ public abstract class BoardObject extends TeleObject implements Serializable {
         registerFieldChange("y", this.y);
     }
 
-//    public int getZ() {
-//        return z;
-//    }
-//
-//    public void setZ(int z) {
-//        this.z = z;
-//    }
     public int getHeight() {
-        return height;
+        return (int) th;
     }
 
     public int getWidth() {
-        return width;
+        return (int) tw;
     }
 
     public boolean hitTest(int x, int y) {
-        int objX = this.x + this.width;
-        int objY = this.y + this.height;
+        int objX = (int) this.tx + this.width;
+        int objY = (int) this.ty + this.height;
 
-        if (x > this.x && x < objX && y > this.y && y < objY) {
+        if (x > this.tx && x < objX && y > this.ty && y < objY) {
             return true;
         } else {
             return false;
@@ -108,16 +125,29 @@ public abstract class BoardObject extends TeleObject implements Serializable {
         this.showBorder = showBorder;
     }
 
-    public abstract void redraw();
-
     public abstract void showProperties();
 
     public abstract void hideProperties();
+
+    public abstract void redraw();
+
+    public void setHeight(Integer height) {
+        this.th = height;
+        this.height = height;
+        registerFieldChange("height", height);
+    }
+
+    public void setWidth(Integer width) {
+        this.tw = width;
+        this.width = width;
+        registerFieldChange("width", width);
+    }
     /****************************************************
      * Animation stuff
      ****************************************************/
     AnimateTask animateTask = null;
     boolean animateX, animateY, animateAlpha;
+    boolean animateW, animateH;
     private final float INTERPOLATION_RATE = 0.3F;
     private final float XY_TOLERANCE = 0.1f;
     private final float ALPHA_TOLERANCE = 0.01f;
@@ -125,6 +155,7 @@ public abstract class BoardObject extends TeleObject implements Serializable {
 
     @Override
     protected void objectUpdated(UpdateInfo params) {
+        System.out.println("BoardObject properties updated!!");
         boolean atLeastOne = false;
         if (params.get("x") != null) {
             // new x has arrived, start interpolating towards it
@@ -132,12 +163,18 @@ public abstract class BoardObject extends TeleObject implements Serializable {
             atLeastOne = true;
         }
         if (params.get("y") != null) {
-            // new x has arrived, start interpolating towards it
             animateY = true;
             atLeastOne = true;
         }
+        if (params.get("width") != null) {
+            animateW = true;
+            atLeastOne = true;
+        }
+        if (params.get("height") != null) {
+            animateH = true;
+            atLeastOne = true;
+        }
         if (params.get("alpha") != null) {
-            // new x has arrived, start interpolating towards it
             animateAlpha = true;
             atLeastOne = true;
         }
@@ -147,6 +184,7 @@ public abstract class BoardObject extends TeleObject implements Serializable {
                 timer.schedule(animateTask, 0, ANIMATE_PERIOD);
             }
         }
+        redraw();
     }
 
     class AnimateTask extends TimerTask {
@@ -160,6 +198,14 @@ public abstract class BoardObject extends TeleObject implements Serializable {
             }
             if (animateY) {
                 ty = Interpolator.lerp(ty, y, INTERPOLATION_RATE);
+                allDone = false;
+            }
+            if (animateW) {
+                tw = Interpolator.lerp(tw, width, INTERPOLATION_RATE);
+                allDone = false;
+            }
+            if (animateH) {
+                th = Interpolator.lerp(th, height, INTERPOLATION_RATE);
                 allDone = false;
             }
             if (animateAlpha) {
@@ -180,9 +226,50 @@ public abstract class BoardObject extends TeleObject implements Serializable {
             if (Math.abs(y - ty) < XY_TOLERANCE) {
                 animateY = false;
             }
+            if (Math.abs(width - tw) < XY_TOLERANCE) {
+                animateW = false;
+            }
+            if (Math.abs(height - th) < XY_TOLERANCE) {
+                animateH = false;
+            }
             if (Math.abs(alpha - talpha) < ALPHA_TOLERANCE) {
                 animateAlpha = false;
             }
         }
+    }
+
+    public abstract void validate();
+
+    public abstract void invalidate();
+
+    public abstract void dispose();
+
+    //**************************************************************************
+    // Resizing functionality
+    //**************************************************************************
+    public abstract boolean isResizable();
+
+    public void scale(float factor) {
+        if (!isResizable()) {
+            return;
+        }
+
+        // old values
+        int ow = getWidth();
+        int oh = getHeight();
+
+        int nw = (int) (factor * ow);
+        int nh = (int) (factor * oh);
+
+        int dw = nw - ow;
+        int dh = nh - oh;
+
+        setWidth(nw);
+        setHeight(nh);
+
+        setX(getX() - dw / 2);
+        setY(getY() - dh / 2);
+
+        redraw();
     }
 }

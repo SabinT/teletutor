@@ -7,7 +7,7 @@ package teletutor.classroommanager.test;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import teletutor.classroommanager.UI.ClassroomFrame;
-import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.classroommanager.services.ClassroomManager;
 import teletutor.core.UI.CoreFrame;
 import teletutor.core.impl.TeleChannelImpl;
 import teletutor.core.services.TeleChannel;
@@ -23,8 +23,8 @@ public class GandhiPig {
    
         try {
             
-            LectureBean lecture =  new LectureBean(123, "Plutonium tatto-making", "Heme");
-            TeleChannel chan = new TeleChannelImpl("../../settings/UDP.xml", lecture, "Gandhi");
+            LectureBean lecture =  new LectureBean(123, "Plutonium tatto-making", "Hemraj");
+            TeleChannel chan = new TeleChannelImpl("../../settings/UDP.xml", lecture, "Pratik");
             
             ClassroomManager crman = new ClassroomManager("ClassroomManager", chan);
             ClassroomFrame frame =  new ClassroomFrame(crman);
