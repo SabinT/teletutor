@@ -1,0 +1,17 @@
+Manifest-Version: 2.0
+Export-Package: teletutor.audiomanager.services
+Bundle-Classpath: .,jmf.jar,sound.jar,META-INF/services/services.jar
+Bundle-Category: Teletutor
+Tool: Bundlor 1.0.0.RELEASE
+Bundle-Name: AudioManager
+Created-By: 1.7.0-ea-b138 (Oracle Corporation)
+Bundle-Vendor: Chaos Studios
+Ant-Version: Apache Ant 1.8.2
+Bundle-Version: 1.0.0
+Bundle-Activator: teletutor.audiomanager.Activator
+Bundle-Description: Handles transmission and palyback of audio
+Bundle-SymbolicName: teletutor.audiomanager
+Import-Package: com.ms.awt;resolution:="optional",com.ms.security;reso
+ lution:="optional",org.osgi.framework,org.osgi.util.tracker,teletutor
+ .core.services
+

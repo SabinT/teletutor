@@ -13,7 +13,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import teletutor.classroommanager.UI.ClassroomFrame;
-import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.classroommanager.services.ClassroomManager;
 import teletutor.core.services.TeleChannel;
 
 /**

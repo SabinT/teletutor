@@ -10,7 +10,7 @@
  */
 package teletutor.classroommanager.UI;
 
-import teletutor.classroommanager.impl.ClassroomManager;
+import teletutor.classroommanager.services.ClassroomManager;
 import teletutor.classroommanager.services.TextMessage;
 import teletutor.classroommanager.services.TextMessageObserver;
 

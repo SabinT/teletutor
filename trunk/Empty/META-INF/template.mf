@@ -1,8 +1,7 @@
 Manifest-Version: 2.0
-Bundle-Name: Blackboard
-Bundle-SymbolicName: teletutor.blackboard
-Bundle-Description: Ze Blackboard
-Bundle-Vendor: Chaos Studios
-Bundle-Activator: teletutor.blackboard.Activator
+Bundle-Name: BUNDLE_NAME_HERE
+Bundle-SymbolicName: teletutor.newbundle
+Bundle-Description: DESCRIPTION_HERE
+Bundle-Vendor: WHATCHA_NAME
+Bundle-Activator: teletutor.newbundle.Activator
 Bundle-Category: Teletutor
-Import-Template: teletutor.core.impl;resolution:=optional

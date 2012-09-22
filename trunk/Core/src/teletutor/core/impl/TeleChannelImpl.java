@@ -145,13 +145,17 @@ public class TeleChannelImpl implements TeleChannel {
     @Override
     public void send(String memberStr, String destObj, Serializable obj) throws Exception {
         // if (!channelMap.containsKey(destObj)) return;
+
         Address member = null;
-        synchronized (memberLock) {
-            member = memberMap.get(memberStr);
-        }
-        if (member == null) {
-            System.out.println("Could not find the member to send message to " + memberStr);
-            return;
+
+        if (memberStr != null) {
+            synchronized (memberLock) {
+                member = memberMap.get(memberStr);
+            }
+            if (member == null) {
+                System.out.println("Could not find the member to send message to " + memberStr);
+                return;
+            }
         }
 
         Message msg = new Message(member, null, obj);
@@ -214,6 +218,11 @@ public class TeleChannelImpl implements TeleChannel {
     @Override
     public boolean isTutorChannel() {
         return (tutorName.equals(channelName));
+    }
+
+    @Override
+    public TeleObject getTeleObject(String name) {
+        return channelMap.get(name);
     }
 
     class SimpleReceiver extends ReceiverAdapter {

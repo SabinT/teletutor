@@ -10,6 +10,12 @@
  */
 package teletutor.blackboard.impl;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author msi
@@ -17,12 +23,16 @@ package teletutor.blackboard.impl;
 public class TextFrame extends javax.swing.JFrame {
 
     TextObject obj = null;
+    ImageIcon paletteIcon = new ImageIcon(getClass().getResource("/palette.jpg"));
+    BufferedImage paletteImage = new BufferedImage(60, 200, BufferedImage.TYPE_3BYTE_BGR);
 
     /** Creates new form TextFrame */
     public TextFrame(TextObject obj) {
         //super("Enter Text");
         initComponents();
-        this.obj = obj;
+        this.setTitle("Text Editor");
+        this.obj = obj;        
+        paletteImage.getGraphics().drawImage(paletteIcon.getImage(), 0, 0, null);      
     }
 
     /** This method is called from within the constructor to
@@ -39,11 +49,31 @@ public class TextFrame extends javax.swing.JFrame {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         fontBox = new javax.swing.JComboBox();
+        fontSizeSpinner = new javax.swing.JSpinner();
+        jColorChooser1 = new javax.swing.JColorChooser();
+        colorPicker = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+                formWindowLostFocus(evt);
+            }
+        });
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                formFocusLost(evt);
+            }
+        });
 
         textArea.setColumns(20);
         textArea.setRows(5);
+        textArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                textAreaKeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(textArea);
 
         okButton.setText("OK");
@@ -60,7 +90,32 @@ public class TextFrame extends javax.swing.JFrame {
             }
         });
 
-        fontBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        fontBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Arial", "Times New Roman", "Georgia", "Courier New", "Comic Sans MS" }));
+        fontBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                fontBoxItemStateChanged(evt);
+            }
+        });
+
+        fontSizeSpinner.setFont(new java.awt.Font("Arial", 0, 13)); // NOI18N
+        fontSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(16, 8, 64, 2));
+        fontSizeSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(fontSizeSpinner, ""));
+        fontSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                fontSizeSpinnerStateChanged(evt);
+            }
+        });
+
+        colorPicker.setIcon(new javax.swing.ImageIcon(getClass().getResource("/palette.jpg"))); // NOI18N
+        colorPicker.setText("jLabel1");
+        colorPicker.setMaximumSize(new java.awt.Dimension(60, 200));
+        colorPicker.setMinimumSize(new java.awt.Dimension(60, 200));
+        colorPicker.setPreferredSize(new java.awt.Dimension(60, 200));
+        colorPicker.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                colorPickerMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -68,26 +123,36 @@ public class TextFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(fontBox, 0, 218, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(fontSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(31, 31, 31)
-                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(fontBox, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
+                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(colorPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(fontBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(colorPicker, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fontBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fontSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(okButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -95,15 +160,73 @@ public class TextFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        obj.setText(textArea.getText());
-        obj.hideProperties();  
-        obj.redraw();            
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                obj.setText(textArea.getText());
+                obj.setShowBorder(false);
+                obj.redraw();
+                obj.hideProperties();
+                obj.validate();
+            }
+        });
+
 
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         obj.hideProperties();
+        obj.invalidate();
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void textAreaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textAreaKeyTyped
+        if (obj != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    obj.setText(textArea.getText());
+                    obj.redraw();
+                }
+            });
+
+        }
+    }//GEN-LAST:event_textAreaKeyTyped
+
+    private void formFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusLost
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                obj.setText(textArea.getText());
+                obj.setShowBorder(false);
+                obj.redraw();
+                obj.hideProperties();
+            }
+        });
+
+    }//GEN-LAST:event_formFocusLost
+
+    private void formWindowLostFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowLostFocus
+        formFocusLost(null);
+
+    }//GEN-LAST:event_formWindowLostFocus
+
+    private void fontBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fontBoxItemStateChanged
+        obj.setFontName((String) fontBox.getSelectedItem());
+        obj.redraw();
+    }//GEN-LAST:event_fontBoxItemStateChanged
+
+    private void fontSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_fontSizeSpinnerStateChanged
+        obj.setFontSize((int) fontSizeSpinner.getValue());
+        obj.redraw();
+    }//GEN-LAST:event_fontSizeSpinnerStateChanged
+
+    private void colorPickerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_colorPickerMouseClicked
+       obj.setColor(new Color(paletteImage.getRGB(evt.getX(), evt.getY())));
+       obj.redraw();
+    }//GEN-LAST:event_colorPickerMouseClicked
     /**
      * @param args the command line arguments
     //     */
@@ -117,9 +240,12 @@ public class TextFrame extends javax.swing.JFrame {
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JLabel colorPicker;
     private javax.swing.JComboBox fontBox;
+    private javax.swing.JSpinner fontSizeSpinner;
+    private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton okButton;
-    private javax.swing.JTextArea textArea;
+    javax.swing.JTextArea textArea;
     // End of variables declaration//GEN-END:variables
 }

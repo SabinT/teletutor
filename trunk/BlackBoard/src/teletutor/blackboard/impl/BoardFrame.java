@@ -25,7 +25,8 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import teletutor.blackboard.services.BlackBoard;
+import teletutor.blackboard.services.Blackboard;
+import teletutor.core.services.TeleChannel;
 
 /**
  *
@@ -33,46 +34,41 @@ import teletutor.blackboard.services.BlackBoard;
  */
 public class BoardFrame extends javax.swing.JFrame {
 
-    BlackBoard board = null;
+    Blackboard board = null;
     Rectango rec1 = null;
     Rectango rec2 = null;
     Rectango rec3 = null;
     JPanel panel = null;
-    MoveTool mover = null;
+    //MoveTool mover = null;
     JToolBar tools = null;
-    TextTool texter = null;
+    TextTool texter = null;    
 
     /** Creates new form MoveTest */
-    public BoardFrame(BlackBoard _board) {
+    public BoardFrame(Blackboard _board) {
         try {
 //            board = new BlackBoardImpl("BlackBoard", null);
 //            board.init(500, 500);
 
+            setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             this.board = _board;
+            TeleChannel channel = ((BlackboardImpl)board).getChannel();
+            this.setTitle("TeleTutor");
 
-            rec1 = new Rectango("Rec1", null);
-            rec1.init(20, 45, 1, 100, 100, Color.red);
-            rec2 = new Rectango("Rec2", null);
-            rec2.init(300, 100, 2, 108, 40, Color.cyan);
-            rec3 = new Rectango("Rec3", null);
-            rec3.init(200, 90, 3, 60, 300, Color.ORANGE);
+            rec1 = new Rectango("Rec1", channel,board, 20, 45, 1, 100, 100, Color.red);
+            rec2 = new Rectango("Rec2", channel,board, 300, 100, 2, 108, 40, Color.cyan);
+            rec3 = new Rectango("Rec3", channel,board,200, 90, 3, 60, 300, Color.ORANGE);
 
-            mover = new MoveTool("MoveTool", null);
-            mover.init(board);
-
-            texter = new TextTool("TextTool", null);
+            texter = new TextTool(TextTool.class.getName(), channel);
             texter.init(board);
 
             board.addObject(rec1);
             board.addObject(rec2);
             board.addObject(rec3);
 
-            board.addTool(mover);
             board.addTool(texter);
 
 
             java.awt.EventQueue.invokeLater(new Runnable() {
-
                 @Override
                 public void run() {
                     panel = board.getBoardPanel();
@@ -80,8 +76,10 @@ public class BoardFrame extends javax.swing.JFrame {
 
                     setLayout(new BorderLayout());
                     getContentPane().add(panel, BorderLayout.CENTER);
-                    getContentPane().add(tools, BorderLayout.NORTH);
+                    getContentPane().add(tools, BorderLayout.WEST);
                     pack();
+                    setResizable(false);
+                    setTitle("TeleTutor - Blackboard");
                 }
             });
         } catch (Exception ex) {
@@ -98,7 +96,7 @@ public class BoardFrame extends javax.swing.JFrame {
 
             public void run() {
                 try {
-                    BlackBoardImpl board = new BlackBoardImpl("BlackBoard", null);
+                    BlackboardImpl board = new BlackboardImpl("BlackBoard", null);
                     board.init(500, 500);
                     new BoardFrame(board).setVisible(true);
                 } catch (Exception ex) {

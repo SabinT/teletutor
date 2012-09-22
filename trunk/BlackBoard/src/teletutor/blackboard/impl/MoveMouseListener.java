@@ -6,7 +6,7 @@ package teletutor.blackboard.impl;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import teletutor.blackboard.services.BlackBoard;
+import teletutor.blackboard.services.Blackboard;
 import teletutor.blackboard.services.BoardObject;
 
 /**
@@ -14,21 +14,20 @@ import teletutor.blackboard.services.BoardObject;
  * @author Samyam
  */
 public class MoveMouseListener extends MouseAdapter {
-    
-    private BoardObject obj = null;
-    private BlackBoard board = null;
+
+    private Blackboard board = null;
     int dx, dy;
-    
-    public MoveMouseListener(BlackBoard board) {
+
+    public MoveMouseListener(Blackboard board) {
         this.board = board;
     }
-    
+
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (obj == null) {
+        if (board.getSelectedObject() == null) {
             return;
         }
-        
+        BoardObject obj = board.getSelectedObject();
         obj.setX(e.getX() - dx);
         obj.setY(e.getY() - dy);
         board.redraw();
@@ -36,36 +35,40 @@ public class MoveMouseListener extends MouseAdapter {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (obj != null){
-            obj.setShowBorder(false);
-            board.redraw();
-            
-        }
-        
-        obj = board.getObjectAt(e.getX(), e.getY());
-        if(obj != null){
-        obj.setShowBorder(true);
-        board.redraw();
+        if (e.getClickCount() == 2) {
+            BoardObject obj = board.getObjectAt(e.getX(), e.getY());
+            if (obj != null) {
+                board.selectObject(obj);
+                obj.showProperties();
+            }
         }
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e) {
-        obj = board.getObjectAt(e.getX(), e.getY());
+//        BoardObject obj = board.getSelectedObject();
+
+//        if (obj != null) {
+            board.selectObject(null);
+//        }
+
+        BoardObject obj = board.getObjectAt(e.getX(), e.getY());
         if (obj != null) {
-            obj.setShowBorder(true);
+            board.selectObject(obj);
+
             dx = e.getX() - obj.getX();
             dy = e.getY() - obj.getY();
         }
     }
-    
+
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(obj != null){
-            obj.setShowBorder(false);
-            board.redraw();
+    }
+
+    public void deselectObject() {
+        BoardObject obj = board.getSelectedObject();
+        if (obj != null) {
+            board.selectObject(null);
         }
-        obj = null;               
-         
     }
 }
