@@ -1,0 +1,1 @@
+Allows tutors and students to come together through the virtual blackboard interface. Features multimedia blackboard, voice communication and plugin architecture for future extension.
